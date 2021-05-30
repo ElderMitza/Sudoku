@@ -1,11 +1,9 @@
 "use strict";
 
-const SudokuSolver = require("../controllers/sudoku-solver.js");
+const routeController = require("../controllers/route-controller");
+const router = require("express").Router();
 
-module.exports = function(app) {
-  let solver = new SudokuSolver();
+router.post("/check", routeController.checkPuzzle);
+router.post("/solve", routeController.solvePuzzle);
 
-  app.route("/api/check").post((req, res) => {});
-
-  app.route("/api/solve").post((req, res) => {});
-};
+module.exports = router;

@@ -39,7 +39,7 @@ app.route("/").get(function(req, res) {
 fccTestingRoutes(app);
 
 // User routes
-apiRoutes(app);
+app.use("/api", apiRoutes);
 
 //404 Not Found Middleware
 app.use(function(req, res, next) {

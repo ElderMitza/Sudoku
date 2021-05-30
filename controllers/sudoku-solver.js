@@ -1,6 +1,14 @@
 class SudokuSolver {
   validate(puzzleString) {
-    console.log("validate");
+    const isValidPuzzleRegExp = /^[0-9.]{81}$/;
+    if (!puzzleString) {
+      return { error: "Required field missing" };
+    } else if (puzzleString.length != 81) {
+      return { error: "Expected puzzle to be 81 characters long" };
+    } else if (!isValidPuzzleRegExp.test(puzzleString)) {
+      return { error: "Invalid characters in puzzle" };
+    }
+    return;
   }
 
   checkRowPlacement(puzzleString, row, column, value) {
