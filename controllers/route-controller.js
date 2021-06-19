@@ -5,13 +5,14 @@ const routeController = {
   checkPuzzle: (req, res) => {
     console.log("checkkk", req.body);
   },
-  solvePuzzle: async (req, res) => {
+  solvePuzzle: (req, res) => {
     const { puzzle } = req.body;
-    const validationResult = await solver.validate(puzzle);
+    const validationResult = solver.validate(puzzle);
     if (validationResult) {
       return res.json(validationResult);
     }
-    // If necessary, handle the actual solving logic below...
+    const solvedString = solver.solve(puzzle);
+    return res.json({ solution: solvedString });
   }
 };
 
