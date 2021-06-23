@@ -91,25 +91,33 @@ class SudokuSolver {
   check(puzzleString, coordinate, value) {
     const row = this.convertRowLetterToNumber(coordinate[0]);
     const column = coordinate[1] * 1 - 1;
-    const params = { puzzleString, row, column, value };
-    const conflicts = [];
-    const isValidRow = this.checkRowPlacement(params);
-    const isValidColumn = this.checkColPlacement(params);
-    const isValidRegion = this.checkRegionPlacement(params);
+    const regionRow = row + 1;
+    const regionColumn = row + 1;
+    const checkColumnRowFuncParams = { puzzleString, row, column, value };
+    const checkRegionParams = {
+      puzzleString,
+      row: regionRow,
+      column: regionColumn,
+      value
+    };
+    const conflict = [];
+    const isValidRow = this.checkRowPlacement(checkColumnRowFuncParams);
+    const isValidColumn = this.checkColPlacement(checkColumnRowFuncParams);
+    const isValidRegion = this.checkRegionPlacement(checkRegionParams);
     if (!isValidRow) {
-      conflicts.push("row");
+      conflict.push("row");
     }
     if (!isValidColumn) {
-      conflicts.push("column");
+      conflict.push("column");
     }
     if (!isValidRegion) {
-      conflicts.push("region");
+      conflict.push("region");
     }
-    const isValidPlacement = conflicts.length === 0;
+    const isValidPlacement = conflict.length === 0;
     if (isValidPlacement) {
       return { valid: true };
     }
-    return { valid: false, conflicts };
+    return { valid: false, conflict };
   }
 
   solveSudukoRecursionAlgorithm(grid, row, col) {
