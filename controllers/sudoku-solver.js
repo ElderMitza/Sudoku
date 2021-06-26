@@ -31,6 +31,46 @@ class SudokuSolver {
     return false;
   }
 
+  solve(puzzleString) {
+    const gridForSolving = this.convertPuzzleStringToGrid(puzzleString);
+    const solvedGrid = this.solveSudukoRecursionAlgorithm(gridForSolving, 0, 0);
+    if (solvedGrid) {
+      return this.convertGridToPuzzleString(solvedGrid);
+    }
+    return false;
+  }
+
+  check(puzzleString, coordinate, value) {
+    const row = this.convertRowLetterToNumber(coordinate[0]);
+    const column = coordinate[1] * 1 - 1;
+    const regionRow = row + 1;
+    const regionColumn = row + 1;
+    const checkColumnRowFuncParams = { puzzleString, row, column, value };
+    const checkRegionParams = {
+      puzzleString,
+      row: regionRow,
+      column: regionColumn,
+      value
+    };
+    const conflict = [];
+    const isValidRow = this.checkRowPlacement(checkColumnRowFuncParams);
+    const isValidColumn = this.checkColPlacement(checkColumnRowFuncParams);
+    const isValidRegion = this.checkRegionPlacement(checkRegionParams);
+    if (!isValidRow) {
+      conflict.push("row");
+    }
+    if (!isValidColumn) {
+      conflict.push("column");
+    }
+    if (!isValidRegion) {
+      conflict.push("region");
+    }
+    const isValidPlacement = conflict.length === 0;
+    if (isValidPlacement) {
+      return { valid: true };
+    }
+    return { valid: false, conflict };
+  }
   checkRowPlacement({ puzzleString, row, column, value }) {
     const gridFromPuzzle = this.convertPuzzleStringToGrid(puzzleString);
     if (
@@ -77,47 +117,6 @@ class SudokuSolver {
       startCol,
       value
     );
-  }
-
-  solve(puzzleString) {
-    const gridForSolving = this.convertPuzzleStringToGrid(puzzleString);
-    const solvedGrid = this.solveSudukoRecursionAlgorithm(gridForSolving, 0, 0);
-    if (solvedGrid) {
-      return this.convertGridToPuzzleString(solvedGrid);
-    }
-    return false;
-  }
-
-  check(puzzleString, coordinate, value) {
-    const row = this.convertRowLetterToNumber(coordinate[0]);
-    const column = coordinate[1] * 1 - 1;
-    const regionRow = row + 1;
-    const regionColumn = row + 1;
-    const checkColumnRowFuncParams = { puzzleString, row, column, value };
-    const checkRegionParams = {
-      puzzleString,
-      row: regionRow,
-      column: regionColumn,
-      value
-    };
-    const conflict = [];
-    const isValidRow = this.checkRowPlacement(checkColumnRowFuncParams);
-    const isValidColumn = this.checkColPlacement(checkColumnRowFuncParams);
-    const isValidRegion = this.checkRegionPlacement(checkRegionParams);
-    if (!isValidRow) {
-      conflict.push("row");
-    }
-    if (!isValidColumn) {
-      conflict.push("column");
-    }
-    if (!isValidRegion) {
-      conflict.push("region");
-    }
-    const isValidPlacement = conflict.length === 0;
-    if (isValidPlacement) {
-      return { valid: true };
-    }
-    return { valid: false, conflict };
   }
 
   solveSudukoRecursionAlgorithm(grid, row, col) {
