@@ -5,12 +5,12 @@ const Solver = require("../controllers/sudoku-solver.js");
 let solver = new Solver();
 const puzzlesAndSolutions = require("../controllers/puzzle-strings");
 const validPuzzleString = puzzlesAndSolutions.puzzlesAndSolutions[0][0];
+const puzzleSolution = puzzlesAndSolutions.puzzlesAndSolutions[0][1];
 const invalidCharacterPuzzleString =
   "..839.7.575..0..964..1..?....16.29846.9.312.7..754.a...62..5.78.8...3.2...492...1";
 const invalidLengthPuzzleString = "..839.7.575..0..964";
 const invalidPuzzleString =
   ".7.89.....599..3.4.2..4..1.5689..472...6.76..1.7.5.63873.1.2.8.6..47.1..2.9.387.6";
-const puzzleSolution = puzzlesAndSolutions.puzzlesAndSolutions[0][1];
 
 suite("UnitTests", () => {
   test("#1 -- Logic handles a valid puzzle string of 81 characters", done => {

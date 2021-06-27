@@ -1,28 +1,13 @@
 require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
-const expect = require("chai").expect;
 const cors = require("cors");
 
 const fccTestingRoutes = require("./routes/fcctesting.js");
 const apiRoutes = require("./routes/api.js");
 const runner = require("./test-runner");
-const mongoose = require("mongoose");
 
 const app = express();
-
-mongoose.connect(process.env.DB, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
-
-const db = mongoose.connection;
-db.once("open", () => {
-  console.log("Cam's app has connected to MongoDB");
-});
-db.on("error", err => {
-  console.log(err);
-});
 
 app.use("/public", express.static(process.cwd() + "/public"));
 app.use(cors({ origin: "*" })); //For FCC testing purposes only
