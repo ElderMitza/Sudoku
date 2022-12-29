@@ -25,7 +25,7 @@ class SudokuSolver {
       return { error: "Invalid characters in puzzle" };
     } else if (isInvalidNumber) {
       return { error: "Invalid value" };
-    } else if (!isValidGridCoordinate.test(coordinate)) {
+    } else if (!/^[A-I][1-9]$/.test(coordinate)) {
       return { error: "Invalid coordinate" };
     }
     return false;
