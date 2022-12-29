@@ -1,167 +1,124 @@
 class SudokuSolver {
-  validateSolve(puzzleString) {
-    const isValidPuzzleRegExp = /^[1-9.]{81}$/;
-    if (!puzzleString) {
-      return { error: "Required field missing" };
-    } else if (puzzleString.length != 81) {
-      return { error: "Expected puzzle to be 81 characters long" };
-    } else if (!isValidPuzzleRegExp.test(puzzleString)) {
-      return { error: "Invalid characters in puzzle" };
+  validate(puzzleString) {}
+
+  letterToNumber(row) {
+    switch (row.toUpperCase()) {
+      case "A":
+        return 1;
+      case "B":
+        return 2;
+      case "C":
+        return 3;
+      case "D":
+        return 4;
+      case "E":
+        return 5;
+      case "F":
+        return 6;
+      case "G":
+        return 7;
+      case "H":
+        return 8;
+      case "I":
+        return 9;
+      default:
+        return "none";
     }
-    return;
   }
 
-  validateCheck(puzzleString, coordinate, value) {
-    const transformedValue = value * 1;
-    const isInvalidNumber = isNaN(transformedValue) || 1 > value || value > 9;
-
-    const isValidPuzzleRegExp = /^[1-9.]{81}$/;
-    const isValidGridCoordinate = /^[A-I|a-i][0-9]$/;
-    if (!puzzleString || !coordinate || !value) {
-      return { error: "Required field(s) missing" };
-    } else if (puzzleString.length != 81) {
-      return { error: "Expected puzzle to be 81 characters long" };
-    } else if (!isValidPuzzleRegExp.test(puzzleString)) {
-      return { error: "Invalid characters in puzzle" };
-    } else if (isInvalidNumber) {
-      return { error: "Invalid value" };
-    } else if (!/^[A-I][1-9]$/.test(coordinate)) {
-      return { error: "Invalid coordinate" };
-    }
-    return false;
-  }
-
-  solve(puzzleString) {
-    const gridForSolving = this.convertPuzzleStringToGrid(puzzleString);
-    const solvedGrid = this.solveSudukoRecursionAlgorithm(gridForSolving, 0, 0);
-    if (solvedGrid) {
-      return this.convertGridToPuzzleString(solvedGrid);
-    }
-    return false;
-  }
-
-  check(puzzleString, coordinate, value) {
-    const row = this.convertRowLetterToNumber(coordinate[0]);
-    const column = coordinate[1] * 1 - 1;
-    const regionRow = row + 1;
-    const regionColumn = row + 1;
-    const checkColumnRowFuncParams = { puzzleString, row, column, value };
-    const checkRegionParams = {
-      puzzleString,
-      row: regionRow,
-      column: regionColumn,
-      value
-    };
-    const conflict = [];
-    const isValidRow = this.checkRowPlacement(checkColumnRowFuncParams);
-    const isValidColumn = this.checkColPlacement(checkColumnRowFuncParams);
-    const isValidRegion = this.checkRegionPlacement(checkRegionParams);
-    if (!isValidRow) {
-      conflict.push("row");
-    }
-    if (!isValidColumn) {
-      conflict.push("column");
-    }
-    if (!isValidRegion) {
-      conflict.push("region");
-    }
-    const isValidPlacement = conflict.length === 0;
-    if (isValidPlacement) {
-      return { valid: true };
-    }
-    return { valid: false, conflict };
-  }
-  checkRowPlacement({ puzzleString, row, column, value }) {
-    const gridFromPuzzle = this.convertPuzzleStringToGrid(puzzleString);
-    if (
-      gridFromPuzzle[row][column] !== 0 &&
-      gridFromPuzzle[row][column] !== Number(value)
-    ) {
+  checkRowPlacement(puzzleString, row, column, value) {
+    let grid = this.transform(puzzleString);
+    row = this.letterToNumber(row);
+    if (grid[row - 1][column - 1] !== 0) {
       return false;
     }
-    for (let i = 0; i < 9; i += 1) {
-      if (gridFromPuzzle[row][i] === Number(value)) {
-        if (i !== Number(column)) {
-          return false;
-        }
+    for (let i = 0; i < 9; i++) {
+      if (grid[row - 1][i] == value) {
+        return false;
       }
     }
     return true;
   }
 
-  checkColPlacement({ puzzleString, row, column, value }) {
-    const gridFromPuzzle = this.convertPuzzleStringToGrid(puzzleString);
-    if (
-      gridFromPuzzle[row][column] !== 0 &&
-      gridFromPuzzle[row][column] !== Number(value)
-    ) {
+  checkColPlacement(puzzleString, row, column, value) {
+    let grid = this.transform(puzzleString);
+    row = this.letterToNumber(row);
+    if (grid[row - 1][column - 1] !== 0) {
       return false;
     }
-    for (let i = 0; i < 9; i += 1) {
-      if (gridFromPuzzle[i][column] === Number(value)) {
-        if (i !== row) {
-          return false;
-        }
+    for (let i = 0; i < 9; i++) {
+      if (grid[i][column - 1] == value) {
+        return false;
       }
     }
     return true;
   }
 
-  checkRegionPlacement({ puzzleString, row, column, value }) {
-    const gridFromPuzzle = this.convertPuzzleStringToGrid(puzzleString);
-    const startRow = row + 1 - (row % 3);
-    const startCol = column + 1 - (column % 3);
-    return this.isSafeToPlaceNumberInRegion(
-      gridFromPuzzle,
-      startRow,
-      startCol,
-      value
-    );
+  checkRegionPlacement(puzzleString, row, col, value) {
+    let grid = this.transform(puzzleString);
+    row = this.letterToNumber(row);
+    if (grid[row - 1][col - 1] !== 0) {
+      return false;
+    }
+    let startRow = row - (row % 3),
+      startCol = col - (col % 3);
+    for (let i = 0; i < 3; i++)
+      for (let j = 0; j < 3; j++)
+        if (grid[i + startRow][j + startCol] == value) return false;
+    return true;
   }
 
-  solveSudukoRecursionAlgorithm(grid, row, col) {
-    const matrixSize = 9;
-    if (row == matrixSize - 1 && col == matrixSize) {
-      return grid;
-    }
-    if (col == matrixSize) {
+  solveSuduko(grid, row, col) {
+    const N = 9;
+
+    if (row == N - 1 && col == N) return grid;
+
+    if (col == N) {
       row++;
       col = 0;
     }
-    if (grid[row][col] != 0) {
-      return this.solveSudukoRecursionAlgorithm(grid, row, col + 1);
-    }
+
+    if (grid[row][col] != 0) return this.solveSuduko(grid, row, col + 1);
+
     for (let num = 1; num < 10; num++) {
-      if (this.isSafeToPlaceNumber(grid, row, col, num)) {
+      if (this.isSafe(grid, row, col, num)) {
         grid[row][col] = num;
-        if (this.solveSudukoRecursionAlgorithm(grid, row, col + 1)) return grid;
+
+        if (this.solveSuduko(grid, row, col + 1)) return grid;
       }
+
       grid[row][col] = 0;
     }
     return false;
   }
 
-  isSafeToPlaceNumber(grid, row, col, num) {
-    for (let i = 0; i <= 8; i++) if (grid[row][i] == num) return false;
-    for (let i = 0; i <= 8; i++) if (grid[i][col] == num) return false;
+  isSafe(grid, row, col, num) {
+    // Check if we find the same num
+    // in the similar row , we
+    // return false
+    for (let x = 0; x <= 8; x++) if (grid[row][x] == num) return false;
 
-    const startRow = row - (row % 3);
-    const startCol = col - (col % 3);
-    return this.isSafeToPlaceNumberInRegion(grid, startRow, startCol, num);
-  }
-  isSafeToPlaceNumberInRegion(grid, startRow, startCol, num) {
-    for (let i = 0; i < 3; i++) {
-      for (let ii = 0; ii < 3; ii++) {
-        if (grid[i + startRow][ii + startCol] == num) {
-          return false;
-        }
-      }
-    }
+    // Check if we find the same num
+    // in the similar column ,
+    // we return false
+    for (let x = 0; x <= 8; x++) if (grid[x][col] == num) return false;
+
+    // Check if we find the same num
+    // in the particular 3*3
+    // matrix, we return false
+    let startRow = row - (row % 3),
+      startCol = col - (col % 3);
+    for (let i = 0; i < 3; i++)
+      for (let j = 0; j < 3; j++)
+        if (grid[i + startRow][j + startCol] == num) return false;
+
     return true;
   }
 
-  convertPuzzleStringToGrid(puzzleString) {
-    const grid = [
+  transform(puzzleString) {
+    // take ..53..23.23. => [[0,0,5,3,0,0,2,3,0],
+    // [2,3,0]
+    let grid = [
       [0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -170,40 +127,43 @@ class SudokuSolver {
       [0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0]
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
     ];
-    let currentRow = -1;
-    let currentColumn = 0;
-    for (let i = 0; i < puzzleString.length; i += 1) {
-      if (i % 9 === 0) {
-        currentRow += 1;
+    let row = -1;
+    let col = 0;
+    for (let i = 0; i < puzzleString.length; i++) {
+      if (i % 9 == 0) {
+        row++;
       }
-      if (currentColumn % 9 === 0) {
-        currentColumn = 0;
+      if (col % 9 == 0) {
+        col = 0;
       }
-      grid[currentRow][currentColumn] =
-        puzzleString[i] === "." ? 0 : +puzzleString[i];
-      currentColumn += 1;
+
+      grid[row][col] = puzzleString[i] === "." ? 0 : +puzzleString[i];
+      col++;
     }
     return grid;
   }
-  convertGridToPuzzleString(grid) {
+
+  transformBack(grid) {
     return grid.flat().join("");
   }
-  convertRowLetterToNumber(letterCharacter) {
-    const letter = letterCharacter.toUpperCase();
-    const lettersAndNumbersObj = {
-      A: 0,
-      B: 1,
-      C: 2,
-      D: 3,
-      E: 4,
-      F: 5,
-      G: 6,
-      H: 7,
-      I: 8
-    };
-    return lettersAndNumbersObj[letter];
+
+  solve(puzzleString) {
+    if (puzzleString.length != 81) {
+      return false;
+    }
+    if (/[^0-9.]/g.test(puzzleString)) {
+      return false;
+    }
+    let grid = this.transform(puzzleString);
+    let solved = this.solveSuduko(grid, 0, 0);
+    if (!solved) {
+      return false;
+    }
+    let solvedString = this.transformBack(solved);
+    console.log("solvedString :>> ", solvedString);
+    return solvedString;
   }
 }
 

@@ -5,7 +5,7 @@ const errorMsg = document.getElementById("error");
 
 document.addEventListener("DOMContentLoaded", () => {
   textArea.value =
-    "..9..5.1.85.4....2432......1...69.83.9.....6.62.71...9......1945....4.37.4.3..6..";
+    "1.5..2.84..63.12.7.2..5.....9..1....8.2.3674.3.7.2..9.47...8..1..16....926914.37.";
   fillpuzzle(textArea.value);
 });
 
@@ -33,9 +33,9 @@ async function getSolved() {
     method: "POST",
     headers: {
       Accept: "application/json",
-      "Content-type": "application/json"
+      "Content-type": "application/json",
     },
-    body: JSON.stringify(stuff)
+    body: JSON.stringify(stuff),
   });
   const parsed = await data.json();
   if (parsed.error) {
@@ -49,15 +49,15 @@ async function getChecked() {
   const stuff = {
     puzzle: textArea.value,
     coordinate: coordInput.value,
-    value: valInput.value
+    value: valInput.value,
   };
   const data = await fetch("/api/check", {
     method: "POST",
     headers: {
       Accept: "application/json",
-      "Content-type": "application/json"
+      "Content-type": "application/json",
     },
-    body: JSON.stringify(stuff)
+    body: JSON.stringify(stuff),
   });
   const parsed = await data.json();
   errorMsg.innerHTML = `<code>${JSON.stringify(parsed, null, 2)}</code>`;
